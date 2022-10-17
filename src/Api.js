@@ -15,14 +15,22 @@ export const LoginApi = async (path, data) => {
         return {
             status: true,
             result: result.data,
-            message: null,
+            message: "Tebrikler, giriş yapıyorsunuz.",
         };
     } catch(error){
-        console.log(error)
-        return {
-            status: false,
-            result: null,
-            message: error.response.data
+        if(error.response){
+            return {
+                status: false,
+                result: null,
+                message: error.response.data
+            }
+        }
+        if(error.request){
+            return {
+                status: false,
+                result: null,
+                message: error.message
+            }
         }
     }
 }

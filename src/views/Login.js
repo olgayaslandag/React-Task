@@ -3,6 +3,7 @@ import {LoginApi} from '../Api';
 import { useDispatch } from "react-redux";
 import { login as loginSlice } from '../store/auth';
 import { Link } from "react-router-dom";
+import Toast from '../Toast'
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,8 +19,12 @@ const Login = () => {
       password: pass
     }
     const result = await LoginApi("/api/auth/login", request);
-        
+    console.log(result)
 
+    Toast.fire({
+      icon: result.status ? 'success' : 'error',
+      title: result.message
+    });
     if(result.status){
         dispatch(loginSlice(result.result));
         window.location.reload()
