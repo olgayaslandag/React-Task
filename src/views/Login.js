@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {LoginApi} from '../Api';
+import { LoginApi } from '../Api';
 import { useDispatch } from "react-redux";
 import { login as loginSlice } from '../store/auth';
 import { Link } from "react-router-dom";
@@ -18,8 +18,7 @@ const Login = () => {
       email,
       password: pass
     }
-    const result = await LoginApi("/api/auth/login", request);
-    console.log(result)
+    const result = await LoginApi(request);
 
     Toast.fire({
       icon: result.status ? 'success' : 'error',
@@ -59,7 +58,7 @@ const Login = () => {
 
               <div className="d-grid gap-2">
                 <button className="btn btn-primary btn-block">Giriş Yap</button>
-                <Link to="/register" className="mt-2 btn btn-link text-center">Kayıt</Link>
+                <Link to="/register" className="mt-2 btn btn-white text-center">Kayıt</Link>
               </div>
             </form>
           </div>

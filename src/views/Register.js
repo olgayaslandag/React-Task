@@ -1,15 +1,16 @@
 import React, {useState} from "react";
-import {RegisterApi} from '../Api';
+import { RegisterApi, LoginApi } from '../Api';
 import { useDispatch } from "react-redux";
 import { login as loginSlice } from '../store/auth';
 import { Link } from "react-router-dom";
+import Toast from '../Toast'
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastname] = useState('');
-
+  const [errors, setErrors] = useState([]);
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
@@ -21,13 +22,36 @@ const Register = () => {
       firstName,
       lastName
     }
-    const result = await RegisterApi("/api/auth/register", request);
-        
 
-    if(result.token){
-        dispatch(loginSlice(result));
-        window.location.reload()
+
+
+    const RegisterRes = await RegisterApi(request);
+    if(RegisterRes.status){
+      const loginAction = await LoginApi({email, password});
+
+      if(loginAction.status){
+          dispatch(loginSlice(loginAction.result));
+          window.location.replace("/")
+      }else{
+        Toast.fire({
+          icon: loginAction.status ? 'success' : 'error',
+          title: loginAction.message
+        });
+      }
+    }else{
+      if(RegisterRes.result){
+        setErrors(RegisterRes.result)
+      }
+      Toast.fire({
+        icon: 'error',
+        title: RegisterRes.message
+      });
     }
+  }
+
+  const errorHandle = (param) => {
+    const getError = errors.find(c => c.param === param);
+    return getError ? getError.msg : null;
   }
 
   return (
@@ -40,20 +64,28 @@ const Register = () => {
                 <label htmlFor="firstName">Ad</label>
                 <input 
                     type="text" 
-                    className="form-control"
+                    className={errorHandle('firstName') ? 'is-invalid form-control' : 'form-control'}
                     id="firstName"
+                    required
                     value={firstName}
                     onChange={e => setFirstName(e.target.value)}></input>
+                    {errorHandle('firstName') && 
+                      <small className="text-danger">{errorHandle('firstName')}</small>
+                    }
               </div>
               
               <div className="mb-3">
                 <label htmlFor="lastName">Soyad</label>
                 <input 
                     type="text" 
-                    className="form-control"
+                    className={errorHandle('lastName') ? 'is-invalid form-control' : 'form-control'}
                     id="lastName"
+                    required
                     value={lastName}
                     onChange={e => setLastname(e.target.value)}></input>
+                    {errorHandle('lastName') && 
+                      <small className="text-danger">{errorHandle('lastName')}</small>
+                    }
               </div>
 
               <div className="mb-3">
@@ -61,9 +93,13 @@ const Register = () => {
                 <input 
                   type="email" 
                   id="email"
-                  className="form-control"
+                  required
+                  className={errorHandle('email') ? 'is-invalid form-control' : 'form-control'}
                   value={email}
                   onChange={e => setEmail(e.target.value)}></input>
+                  {errorHandle('email') && 
+                      <small className="text-danger">{errorHandle('email')}</small>
+                    }
               </div>
 
               <div className="mb-3">
@@ -71,14 +107,18 @@ const Register = () => {
                 <input 
                   type="password" 
                   id="password" 
-                  className="form-control"
+                  required
+                  className={errorHandle('password') ? 'is-invalid form-control' : 'form-control'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}></input>
+                  {errorHandle('password') && 
+                      <small className="text-danger">{errorHandle('password')}</small>
+                    }
               </div>
 
               <div className="d-grid gap-2">
                 <button className="btn btn-primary btn-block">Kayıt</button>
-                <Link to="/" className="mt-2 btn btn-link text-center">Giriş Yap</Link>
+                <Link to="/" className="mt-2 btn btn-white text-center">Giriş Yap</Link>
               </div>
             </form>
           </div>
