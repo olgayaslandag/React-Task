@@ -8,6 +8,7 @@ import Toast from '../Toast'
 const Login = () => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
+  const [errors, setErrors] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -27,7 +28,17 @@ const Login = () => {
     if(result.status){
         dispatch(loginSlice(result.result));
         window.location.reload()
+    }else{
+      if(result.result){
+        setErrors(result.result)
+      }
     }
+  }
+
+
+  const errorHandle = (param) => {
+    const getError = errors.find(c => c.param === param);
+    return getError ? getError.msg : null;
   }
 
   return (
@@ -41,9 +52,13 @@ const Login = () => {
                 <input 
                   id="email"
                   type="email" 
-                  className="form-control"
+                  required
+                  className={errorHandle('email') ? 'is-invalid form-control' : 'form-control'}
                   value={email}
                   onChange={e => setEmail(e.target.value)}></input>
+                  {errorHandle('email') && 
+                      <small className="text-danger">{errorHandle('email')}</small>
+                    }
               </div>
 
               <div className="mb-3">
@@ -51,9 +66,13 @@ const Login = () => {
                 <input 
                   type="password" 
                   id="password"
-                  className="form-control"
+                  required
+                  className={errorHandle('password') ? 'is-invalid form-control' : 'form-control'}
                   value={pass}
                   onChange={e => setPass(e.target.value)}></input>
+                  {errorHandle('password') && 
+                      <small className="text-danger">{errorHandle('password')}</small>
+                    }
               </div>
 
               <div className="d-grid gap-2">

@@ -23,12 +23,11 @@ export const LoginApi = async (data) => {
             message: "Tebrikler, giriş yapıyorsunuz.",
         };
     } catch(error){
-        console.log(error)
         if(error.response){
             return {
                 status: false,
-                result: null,
-                message: error.response.data
+                result: error.response.data.errors ?? null,
+                message: typeof error.response.data === "string" ? error.response.data : "Giriş yapılamadı!"
             }
         }else if(error.request){
             return {
